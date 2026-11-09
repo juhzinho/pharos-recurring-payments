@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pharos Recurring Payments</title>
+  <meta name="description" content="A SkillEngine skill that runs a weekly or monthly USDC payment on Pharos: each period is a pre-signed, time-locked authorization the chain accepts once — never early, never late, never twice." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --paper:#f2f0e9; --card:#fffdf7; --ink:#18191d; --muted:#6a6c73; --line:#e2ded2; --line-2:#cdc8ba; --brand:#0033ff; --ok:#1d7a4d; --ok-soft:#e3f2e8; --warn:#9a5b00; --warn-soft:#fbeed6; --bad:#c2311f; --bad-soft:#fbe6e2; --sched:#3d55c4; --sched-soft:#e8ecfb; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace; --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body { margin: 0; font: 15px/1.5 var(--sans); color: var(--ink); background: var(--paper); }
+    a { color: var(--brand); }
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .top { position: sticky; top: 0; z-index: 10; background: var(--paper); display: flex; align-items: center; gap: 16px; padding: 14px 40px; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; gap: 10px; align-items: center; color: inherit; text-decoration: none; }
+    .brand b { font-size: 14px; letter-spacing: .12em; font-weight: 800; } .brand em { font-style: normal; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: .1em; }
+    .spacer { flex: 1; } .links a { font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: none; margin-right: 14px; }
+    .lang button { border: 1px solid var(--line-2); background: var(--card); padding: 6px 11px; font: 600 12px var(--sans); cursor: pointer; color: var(--ink); }
+    .lang button:first-child { border-radius: 999px 0 0 999px; } .lang button:last-child { border-radius: 0 999px 999px 0; border-left: 0; }
+    .lang button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+    main { max-width: 1120px; margin: 0 auto; padding: 40px 40px 24px; display: grid; gap: 22px; }
+    .kicker { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--brand); margin: 0 0 10px; }
+    h1 { font-size: clamp(34px, 6vw, 56px); line-height: .95; letter-spacing: -.04em; margin: 0 0 12px; }
+    .lead { color: var(--muted); margin: 0; font-size: 17px; max-width: 64ch; }
+    section.panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; min-width: 0; }
+    .panel h2 { font-size: 17px; margin: 0 0 4px; letter-spacing: -.01em; }
+    .sub { color: var(--muted); font-size: 13.5px; margin: 0 0 16px; max-width: 82ch; }
+    .btn { padding: 8px 16px; border: 0; border-radius: 999px; background: var(--ink); color: #fff; font: 600 13px var(--sans); cursor: pointer; white-space: nowrap; }
+    .btn:disabled { opacity: .45; cursor: default; } .btn.ghost { background: var(--card); color: var(--ink); border: 1px solid var(--line-2); }
+    .muted { color: var(--muted); } .err { color: var(--bad); }
+    .chip { display: inline-block; font: 700 10.5px var(--sans); letter-spacing: .07em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+    .s-paid { background: var(--ok-soft); color: var(--ok); } .s-failed, .s-missed { background: var(--bad-soft); color: var(--bad); } .s-pending, .s-due { background: var(--warn-soft); color: var(--warn); }
+    .s-scheduled { background: var(--sched-soft); color: var(--sched); } .s-settled { background: var(--ok-soft); color: var(--ok); } .s-cancelled { background: #ecebe6; color: var(--muted); text-decoration: line-through; }
+    /* replay */
+    .clock { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .clock .now { font: 600 15px var(--mono); } .clock .blk { font: 12px var(--mono); color: var(--muted); }
+    .ctrl { display: flex; gap: 6px; align-items: center; } .ctrl input[type=range] { width: 220px; accent-color: var(--ink); }
+    .weeks { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .wk { border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-width: 0; transition: border-color .2s, box-shadow .2s; }
+    .wk.focus { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+    .wk .n { font: 600 11px var(--mono); color: var(--muted); } .wk .d { font: 600 14px var(--sans); margin: 2px 0 8px; }
+    .wk .x { font-size: 11.5px; color: var(--muted); margin-top: 8px; overflow-wrap: anywhere; min-height: 2.6em; }
+    .story { margin-top: 16px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; }
+    .caption { font-size: 15.5px; font-weight: 600; margin: 0 0 8px; }
+    .facts { list-style: none; margin: 0; padding: 0; font-size: 13px; } .facts li { padding: 6px 0; border-top: 1px dashed var(--line); } .facts li:first-child { border-top: 0; }
+    .facts code, .quote { font: 12px var(--mono); }
+    .quote { display: inline-block; background: var(--bad-soft); color: var(--bad); padding: 1px 6px; border-radius: 4px; }
+    .log { background: #15161b; color: #dfe2ea; border-radius: 10px; padding: 10px 12px; font: 11.5px/1.6 var(--mono); max-height: 260px; overflow: auto; }
+    .log .t { color: #8a90a0; } .log .ty { color: #9db0ff; } .log .r { color: #ff9b8a; } .log .new { background: rgba(157,176,255,.12); }
+    .proofs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+    .proof { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 13px; } .proof b { display: block; font-size: 20px; font-family: var(--mono); letter-spacing: -.02em; }
+    /* planner */
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .tabs button { border: 1px solid var(--line-2); background: var(--card); color: var(--ink); border-radius: 999px; padding: 7px 14px; font: 600 13px var(--sans); cursor: pointer; }
+    .tabs button.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+    .form label { display: block; font: 600 12px var(--sans); color: var(--muted); margin-bottom: 3px; }
+    .form input, .form select { width: 100%; padding: 8px 10px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--paper); color: var(--ink); font: 12.5px var(--mono); }
+    .form .wide { grid-column: span 2; } .form .go { display: flex; align-items: end; }
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+    .tile { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; min-width: 0; }
+    .tile .k { font: 600 11px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); } .tile .v { font: 600 19px var(--mono); margin-top: 2px; overflow-wrap: anywhere; } .tile .s { font-size: 12px; color: var(--muted); }
+    .cal { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .cal th { text-align: left; font: 600 11px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 10px 8px 0; border-bottom: 1px solid var(--line-2); }
+    .cal td { padding: 8px 10px 8px 0; border-bottom: 1px dashed var(--line); vertical-align: top; }
+    .warns { list-style: none; padding: 0; margin: 12px 0 0; font-size: 13px; color: var(--warn); }
+    details summary { cursor: pointer; color: var(--muted); font-size: 12.5px; margin-top: 10px; }
+    .code { background: #15161b; color: #e6e8ef; border-radius: 8px; padding: 10px 12px; font: 11.5px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 6px; max-height: 300px; overflow: auto; }
+    .how { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .how div { font-size: 13px; } .how b { display: block; margin-bottom: 4px; font-size: 13.5px; } .how span { color: var(--muted); }
+    footer { color: var(--muted); font-size: 12.5px; max-width: 1120px; margin: 0 auto; padding: 4px 40px 44px; } footer a { color: var(--muted); }
+    [hidden] { display: none !important; }
+    @media (max-width: 960px) { .weeks { grid-template-columns: repeat(3, 1fr); } .story { grid-template-columns: 1fr; } .proofs, .summary { grid-template-columns: 1fr 1fr; } .form { grid-template-columns: 1fr 1fr; } .how { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 680px) {
+      .top { padding: 12px 16px; } main { padding: 26px 16px 16px; } footer { padding: 4px 16px 32px; } .brand em, .links { display: none; }
+      section.panel { padding: 16px; } .weeks { grid-template-columns: 1fr 1fr; } .proofs, .summary, .form, .how { grid-template-columns: 1fr; } .form .wide { grid-column: auto; }
+      .ctrl input[type=range] { width: 140px; } .cal .hide-s { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#"><svg width="22" height="22" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="#0033ff"/><path d="M17 8a9 9 0 1 0 9 9h-3a6 6 0 1 1-6-6V8z" fill="#fff"/><path d="M17 5l5 4.5-5 4.5z" fill="#fff"/></svg><span><b>PHAROS</b> <em>RECURRING PAYMENTS</em></span></a>
+    <span class="spacer"></span>
+    <nav class="links"><a href="https://github.com/juhzinho/pharos-recurring-payments" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/juhzinho/pharos-recurring-payments/blob/main/skill/pharos-recurring-payments/SKILL.md" target="_blank" rel="noopener">SKILL.md</a></nav>
+    <div class="lang"><button data-lang="en">EN</button><button data-lang="pt">PT</button></div>
+  </header>
+
+  <main>
+    <section>
+      <p class="kicker">SkillEngine · Medium · Pharos Pacific</p>
+      <h1>Recurring Payments</h1>
+      <p class="lead" data-i="lead"></p>
+    </section>
+
+    <section class="panel">
+      <h2 data-i="replayTitle"></h2>
+      <p class="sub" id="replaySub"></p>
+      <div class="clock">
+        <div><div class="now" id="now"></div><div class="blk" id="blk"></div></div>
+        <span class="spacer"></span>
+        <div class="ctrl"><button class="btn ghost" id="prev" aria-label="previous">‹</button><input type="range" id="step" min="0" value="0" /><button class="btn ghost" id="next" aria-label="next">›</button><button class="btn" id="play" data-i="play"></button></div>
+      </div>
+      <div class="weeks" id="weeks"></div>
+      <div class="story">
+        <div><p class="caption" id="caption"></p><ul class="facts" id="facts"></ul></div>
+        <div><div class="muted" style="font-size:12px;margin-bottom:6px" data-i="ledgerTitle"></div><div class="log" id="log"></div></div>
+      </div>
+      <div class="proofs" id="proofs"></div>
+    </section>
+
+    <section class="panel">
+      <h2 data-i="planTitle"></h2>
+      <p class="sub" data-i="planSub"></p>
+      <div class="tabs" id="tabs"></div>
+      <form class="form" id="form" hidden>
+        <div class="wide"><label for="f-payer" data-i="fPayer"></label><input id="f-payer" spellcheck="false" autocomplete="off" /></div>
+        <div class="wide"><label for="f-recipient" data-i="fRecipient"></label><input id="f-recipient" spellcheck="false" autocomplete="off" /></div>
+        <div><label for="f-amount" data-i="fAmount"></label><input id="f-amount" inputmode="decimal" /></div>
+        <div><label for="f-every" data-i="fEvery"></label><select id="f-every"><option value="monthly">monthly</option><option value="weekly">weekly</option></select></div>
+        <div><label for="f-start" data-i="fStart"></label><input id="f-start" spellcheck="false" /></div>
+        <div><label for="f-count" data-i="fCount"></label><input id="f-count" inputmode="numeric" /></div>
+        <div><label for="f-grace" data-i="fGrace"></label><input id="f-grace" inputmode="numeric" /></div>
+        <div class="go"><button class="btn" id="planBtn" type="submit" data-i="planBtn"></button></div>
+      </form>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px"><span class="muted num" id="pmeta" style="font-size:12.5px"></span><span class="spacer"></span><button class="btn ghost" id="liveBtn" data-i="liveBtn"></button></div>
+      <p class="muted" id="msg" style="font-size:13px;margin:0 0 10px"></p>
+      <div id="plan"></div>
+    </section>
+
+    <section class="panel">
+      <h2 data-i="recTitle"></h2>
+      <p class="sub" data-i="recSub"></p>
+      <div id="rec"></div>
+    </section>
+
+    <section class="panel">
+      <h2 data-i="howTitle"></h2>
+      <div class="how" id="how" style="margin-top:12px"></div>
+    </section>
+  </main>
+  <footer id="footer"></footer>
+
+  <script type="module">
+    const T = {
+      en: {
+        lead: "Rent, a subscription, a payroll: the payer signs the whole schedule once. Each payment is an authorization USDC accepts only inside its own window and only once — so the agent can pay on time, retry after a failure and survive a crash without ever paying a period twice.",
+        status: { scheduled: "scheduled", due: "due", pending: "pending", paid: "paid", failed: "failed", missed: "missed", cancelled: "cancelled", settled: "settled" },
+        replayTitle: "Six weeks of rent, replayed", replaySub: (b) => `A real run on an Anvil fork of Pacific mainnet (block ${b}), with the chain clock moved forward week by week. Test wallets funded on the fork only. Step through it, or press play.`,
+        play: "Play", pause: "Pause", chainTime: "chain time", block: "block", period: "Period", windowTo: "window to",
+        ledgerTitle: "The agent's ledger so far (newest last; this step highlighted)",
+        steps: [
+          "One hour before the first due time: nothing to do — and the chain itself refuses an early payment.",
+          "Due: the agent pays period 1.",
+          "The agent crashed after sending period 2, before writing the hash down. The next tick finds the payment on chain and sends nothing.",
+          "Period 3 is due but the payer has only 100 USDC: failed, nothing sent.",
+          "Six hours later, still short: failed again — still nothing sent, still inside the window.",
+          "The payer topped up: period 3 is paid — once.",
+          "The payer moved USDC out in the same block as the payment: the sent transaction reverted. Recorded as failed.",
+          "After a top-up: period 4 is paid — once.",
+          "The payer cancelled period 5 on chain before its due time: the agent finds it and pays nothing.",
+          "Period 6 is due with 0 USDC: failed, nothing sent.",
+          "The window closed: period 6 is missed. Even with money now, the expired authorization cannot be used.",
+        ],
+        f: {
+          early: (r) => `An early submission is refused by USDC: <span class="quote">${r}</span>`,
+          late: (r) => `A late submission is refused by USDC: <span class="quote">${r}</span>`,
+          lost: (h) => `The lost transaction ${h} — the ledger had only the intent`,
+          replay: (h, r) => `A deliberate replay of the same authorization, sent anyway: ${h} → <span class="quote">${r}</span>`,
+          drain: "The payer's own transfer came first in the block",
+          cancel: (h) => `The payer's cancelAuthorization ${h}`,
+          tx: (h) => `Transaction ${h}`,
+          reason: (r) => `Reason: <span class="quote">${r}</span>`,
+          nothing: "No transaction sent this tick",
+        },
+        proofs: {
+          money: (a, n, p) => [`${a} USDC`, `received in ${n} transfers — for ${p} paid periods. Nothing twice.`],
+          rebuilt: (ok) => [ok ? "✓ identical" : "✗ differs", "the history rebuilt from the chain alone, after throwing the ledger away"],
+          windows: () => ["early · late · twice", "all three refused by the USDC contract itself, quoted above"],
+        },
+        planTitle: "Plan a schedule, live on Pacific", planSub: "The calendar (monthly payments keep their day; the 31st becomes the 28th in February and the 31st again in March), each period's nonce read on chain, how many payments the payer's USDC covers today, and the gas of one payment measured at the head block.",
+        tabs: { rent: "Rent · monthly", weekly: "Payout · weekly", mine: "Your schedule" },
+        fPayer: "Payer (any Pacific address)", fRecipient: "Recipient", fAmount: "Amount (USDC)", fEvery: "Every", fStart: "First due (UTC, ISO)", fCount: "Payments", fGrace: "Grace (hours)", planBtn: "Plan it",
+        liveBtn: "Re-read live", running: "Reading Pacific: balance, nonces, gas… (~5–15 s)", recorded: "recorded", live: "live",
+        tiles: { covers: "Covered today", coversS: (b) => `payer holds ${b} USDC`, next: "Next payment", gas: "Gas per payment", gasS: (p, u) => `${p} PROS · $${u}`, total: "In all", totalS: (n) => `${n} payments` },
+        cols: ["#", "Due (UTC)", "Window ends", "Nonce on chain", "Today"], covered: "covered", notCovered: "not covered", unused: "unused", consumed: "consumed",
+        signed: "What the payer signs, once (eth_signTypedData_v4)",
+        in: (s) => `in ${s}`,
+        recTitle: "Found again from the chain alone", recSub: "A real EIP-3009 authorization used on Pacific, looked up knowing only who signed it and its nonce: a binary search over authorizationState at past blocks, then that one block's log. This is how the agent rebuilds its history after a crash.",
+        rec: (r) => [`block ${r.found.block}`, `tx ${r.found.hash}`, `${r.search.blocks.toLocaleString("en-US")} blocks searched in ${r.search.seconds.toFixed(1)} s`, r.match ? "✓ the same block and transaction as the event" : "✗ mismatch"],
+        howTitle: "How it works",
+        how: [["1 · Sign the schedule once", "One USDC TransferWithAuthorization per period: recipient, amount, a window from the due time to the end of the grace, and a nonce derived from the schedule. No gas."], ["2 · Tick on time", "Each tick reads the chain clock and every nonce. The period whose window is open is checked (balance, blacklist, a simulated call) and prepared — or sent by a relayer."], ["3 · Fail safely", "No funds: failed with the reason, nothing sent, retried until the window closes. A sent payment that reverts is recorded. A transaction in flight is never doubled."], ["4 · The chain decides", "USDC accepts each nonce once, only inside its window. Paid, cancelled and missed are read from chain — a lost ledger is rebuilt from it."]],
+        footer: (r) => `Mainnet data recorded on Pharos Pacific ${r}. Nothing on this page signs or sends a transaction.`,
+        errNet: "Could not reach the planner. Try again in a minute.",
+        ago: (s) => s, d: "d", h: "h", min: "min",
+      },
+      pt: {
+        lead: "Aluguel, assinatura, folha de pagamento: o pagador assina a agenda inteira uma vez. Cada pagamento é uma autorização que o USDC só aceita dentro da própria janela e uma única vez — então o agente paga na hora, tenta de novo depois de uma falha e sobrevive a uma queda sem nunca pagar um período duas vezes.",
+        status: { scheduled: "agendado", due: "vencido", pending: "pendente", paid: "pago", failed: "falhou", missed: "perdido", cancelled: "cancelado", settled: "liquidado" },
+        replayTitle: "Seis semanas de aluguel, reproduzidas", replaySub: (b) => `Uma execução real num fork Anvil da mainnet Pacific (bloco ${b}), com o relógio da rede avançado semana a semana. Carteiras de teste abastecidas só no fork. Avance passo a passo ou aperte play.`,
+        play: "Play", pause: "Pausar", chainTime: "horário da rede", block: "bloco", period: "Período", windowTo: "janela até",
+        ledgerTitle: "O registro do agente até aqui (mais novo no fim; este passo destacado)",
+        steps: [
+          "Uma hora antes do primeiro vencimento: nada a fazer — e a própria rede recusa um pagamento adiantado.",
+          "Venceu: o agente paga o período 1.",
+          "O agente caiu depois de enviar o período 2, antes de anotar o hash. O tick seguinte acha o pagamento na rede e não envia nada.",
+          "O período 3 venceu, mas o pagador só tem 100 USDC: falhou, nada enviado.",
+          "Seis horas depois, ainda faltando: falhou de novo — nada enviado, ainda dentro da janela.",
+          "O pagador repôs o saldo: o período 3 é pago — uma vez.",
+          "O pagador tirou USDC no mesmo bloco do pagamento: a transação enviada reverteu. Registrada como falha.",
+          "Depois de repor o saldo: o período 4 é pago — uma vez.",
+          "O pagador cancelou o período 5 na rede antes do vencimento: o agente encontra isso e não paga nada.",
+          "O período 6 venceu com 0 USDC: falhou, nada enviado.",
+          "A janela fechou: o período 6 foi perdido. Mesmo com dinheiro agora, a autorização expirada não pode ser usada.",
+        ],
+        f: {
+          early: (r) => `Um envio adiantado é recusado pelo USDC: <span class="quote">${r}</span>`,
+          late: (r) => `Um envio atrasado é recusado pelo USDC: <span class="quote">${r}</span>`,
+          lost: (h) => `A transação perdida ${h} — o registro só tinha a intenção`,
+          replay: (h, r) => `Um replay proposital da mesma autorização, enviado mesmo assim: ${h} → <span class="quote">${r}</span>`,
+          drain: "A transferência do próprio pagador entrou antes no bloco",
+          cancel: (h) => `O cancelAuthorization do pagador ${h}`,
+          tx: (h) => `Transação ${h}`,
+          reason: (r) => `Motivo: <span class="quote">${r}</span>`,
+          nothing: "Nenhuma transação enviada neste tick",
+        },
+        proofs: {
+          money: (a, n, p) => [`${a} USDC`, `recebidos em ${n} transferências — para ${p} períodos pagos. Nada em dobro.`],
+          rebuilt: (ok) => [ok ? "✓ idêntico" : "✗ difere", "o histórico reconstruído só da rede, depois de jogar o registro fora"],
+          windows: () => ["cedo · tarde · em dobro", "os três recusados pelo próprio contrato do USDC, citados acima"],
+        },
+        planTitle: "Planeje uma agenda, ao vivo na Pacific", planSub: "O calendário (pagamentos mensais mantêm o dia; o dia 31 vira 28 em fevereiro e volta a 31 em março), o nonce de cada período lido na rede, quantos pagamentos o USDC do pagador cobre hoje e o gás de um pagamento medido no bloco atual.",
+        tabs: { rent: "Aluguel · mensal", weekly: "Repasse · semanal", mine: "Sua agenda" },
+        fPayer: "Pagador (qualquer endereço da Pacific)", fRecipient: "Destinatário", fAmount: "Valor (USDC)", fEvery: "Frequência", fStart: "Primeiro vencimento (UTC, ISO)", fCount: "Pagamentos", fGrace: "Tolerância (horas)", planBtn: "Planejar",
+        liveBtn: "Reler ao vivo", running: "Lendo a Pacific: saldo, nonces, gás… (~5–15 s)", recorded: "gravado", live: "ao vivo",
+        tiles: { covers: "Cobertos hoje", coversS: (b) => `o pagador tem ${b} USDC`, next: "Próximo pagamento", gas: "Gás por pagamento", gasS: (p, u) => `${p} PROS · US$ ${u}`, total: "No total", totalS: (n) => `${n} pagamentos` },
+        cols: ["#", "Vencimento (UTC)", "Fim da janela", "Nonce na rede", "Hoje"], covered: "coberto", notCovered: "não coberto", unused: "livre", consumed: "consumido",
+        signed: "O que o pagador assina, uma vez (eth_signTypedData_v4)",
+        in: (s) => `em ${s}`,
+        recTitle: "Encontrado de novo só pela rede", recSub: "Uma autorização EIP-3009 real usada na Pacific, procurada sabendo só quem assinou e o nonce: busca binária no authorizationState em blocos passados e depois o log daquele bloco. É assim que o agente reconstrói o histórico depois de uma queda.",
+        rec: (r) => [`bloco ${r.found.block}`, `tx ${r.found.hash}`, `${r.search.blocks.toLocaleString("pt-BR")} blocos pesquisados em ${r.search.seconds.toFixed(1).replace(".", ",")} s`, r.match ? "✓ o mesmo bloco e a mesma transação do evento" : "✗ não bate"],
+        howTitle: "Como funciona",
+        how: [["1 · Assina a agenda uma vez", "Uma TransferWithAuthorization do USDC por período: destinatário, valor, uma janela do vencimento até o fim da tolerância e um nonce derivado da agenda. Sem gás."], ["2 · Tick na hora", "Cada tick lê o relógio da rede e todos os nonces. O período com janela aberta é conferido (saldo, blacklist, chamada simulada) e preparado — ou enviado por um relayer."], ["3 · Falha com segurança", "Sem saldo: falhou com o motivo, nada enviado, nova tentativa até a janela fechar. Um pagamento enviado que reverte é registrado. Uma transação em voo nunca é duplicada."], ["4 · A rede decide", "O USDC aceita cada nonce uma vez, só dentro da janela. Pago, cancelado e perdido são lidos da rede — um registro perdido é reconstruído a partir dela."]],
+        footer: (r) => `Dados da mainnet gravados na Pharos Pacific em ${r}. Nada nesta página assina ou envia transação.`,
+        errNet: "Não consegui falar com o planejador. Tente de novo em um minuto.",
+        d: "d", h: "h", min: "min",
+      },
+    };
+    const EXPLORER = "https://www.pharosscan.xyz";
+    const RUNS = { rent: "runs/plan-rent.json", weekly: "runs/plan-weekly.json" };
+    let lang = "en", step = 0, timer = null, tab = "rent", view = null, mineView = null, fork = null, rec = null;
+    const recorded = {};
+    try { const l = localStorage.getItem("rp-lang"); if (l === "pt" || l === "en") lang = l; else if ((navigator.language || "").startsWith("pt")) lang = "pt"; } catch {}
+    const t = () => T[lang];
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    const loc = () => (lang === "pt" ? "pt-BR" : "en-US");
+    const short = (h) => (h ? `${h.slice(0, 10)}…${h.slice(-6)}` : "");
+    const usdc = (raw) => { const v = BigInt(raw), i = v / 1000000n, f = (v % 1000000n).toString().padStart(6, "0").replace(/0+$/, ""); return i.toLocaleString(loc()) + (f ? (lang === "pt" ? "," : ".") + f : ""); };
+    const usdcText = (s) => (lang === "pt" ? s.replace(/,/g, "§").replace(/\./g, ",").replace(/§/g, ".") : s);
+    const when = (iso, opts = { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }) => new Date(iso).toLocaleString(loc(), opts) + (opts.timeZone === "UTC" && (opts.timeStyle || opts.hour) ? " UTC" : "");
+    const dur = (sec) => { const s = Math.max(0, sec), d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60); return d ? `${d} ${t().d} ${h} ${t().h}` : h ? `${h} ${t().h} ${m} ${t().min}` : `${m} ${t().min}`; };
+    const chip = (st) => `<span class="chip s-${st}">${esc(t().status[st] ?? st)}</span>`;
+    // the agent writes reasons in English; translated here, contract reasons quoted as they are
+    function tr(s) {
+      if (lang !== "pt" || !s) return s;
+      let m;
+      if ((m = /^insufficient balance: the payer has (\S+) USDC, the payment is (\S+) USDC$/.exec(s))) return `saldo insuficiente: o pagador tem ${usdcText(m[1])} USDC, o pagamento é de ${usdcText(m[2])} USDC`;
+      if ((m = /^transaction reverted: (.*)$/.exec(s))) return `a transação reverteu: ${m[1]}`;
+      if (/^the window closed unpaid/.test(s)) return "a janela fechou sem pagamento: a autorização expirou e nunca mais pode ser usada";
+      if (/^no payment was made inside the window/.test(s)) return "nenhum pagamento foi feito dentro da janela";
+      if ((m = /^today's balance covers (\d+) of the (\d+) remaining payments — the payment due (\S+) would fail unless the payer tops up$/.exec(s))) return `o saldo de hoje cobre ${m[1]} dos ${m[2]} pagamentos restantes — o que vence em ${m[3]} falharia se o pagador não repuser`;
+      if (/^the payer has an EIP-7702 delegation/.test(s)) return "o pagador tem uma delegação EIP-7702: o USDC confere a assinatura pelo contrato delegado (EIP-1271), então uma assinatura comum da chave pode ser recusada";
+      if (/^the payer is a contract/.test(s)) return "o pagador é um contrato: o USDC confere as assinaturas por EIP-1271";
+      if (/blacklisted by USDC/.test(s)) return s.replace("the payer is blacklisted by USDC: no payment can go through", "o pagador está na blacklist do USDC: nenhum pagamento passa").replace("the recipient is blacklisted by USDC: no payment can go through", "o destinatário está na blacklist do USDC: nenhum pagamento passa");
+      return s;
+    }
+    const SRC_PT = { "this agent's transaction": "transação deste agente", "cancelled by the payer on chain": "cancelado pelo pagador na rede" };
+    const src = (s) => (lang === "pt" ? SRC_PT[s] ?? (/interrupted send/.test(s) ? "envio interrompido deste agente: a intenção estava no disco, o hash não — recuperado da rede, nada reenviado" : s) : s);
+
+    // ───────── replay ─────────
+    function renderReplay() {
+      if (!fork) return;
+      const s = fork.steps[step];
+      $("replaySub").textContent = t().replaySub(Number(fork.forkBlock).toLocaleString(loc()));
+      $("step").max = fork.steps.length - 1; $("step").value = step;
+      $("prev").disabled = step === 0; $("next").disabled = step === fork.steps.length - 1;
+      $("now").textContent = `${t().chainTime} · ${when(s.block.iso)}`;
+      $("blk").textContent = `${t().block} ${Number(s.block.number).toLocaleString(loc())}`;
+      const focus = Number(/^P(\d)/.exec(s.label)?.[1] ?? 0);
+      $("weeks").innerHTML = s.periods.map((p) => {
+        const sp = fork.schedule.periods[p.number - 1];
+        const x = p.hash ? `tx ${short(p.hash)}` : p.reason ? esc(tr(p.reason)) : `${t().windowTo} ${when(sp.windowEnds, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" })}`;
+        return `<div class="wk ${p.number === focus ? "focus" : ""}"><div class="n">${t().period} ${p.number}</div><div class="d">${when(sp.due, { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" })}</div>${chip(p.status)}<div class="x">${x}</div></div>`;
+      }).join("");
+      $("caption").textContent = t().steps[step];
+      const f = [];
+      if (s.early) f.push(t().f.early(esc(s.early)));
+      if (s.lostHash) f.push(t().f.lost(`<code>${short(s.lostHash)}</code>`));
+      if (s.replay) f.push(t().f.replay(`<code>${short(s.replay.hash)}</code>`, esc(s.replay.reason)));
+      if (s.drain) f.push(t().f.drain + ` <code>${short(s.drain)}</code>`);
+      if (s.cancelHash) f.push(t().f.cancel(`<code>${short(s.cancelHash)}</code>`));
+      if (s.action?.hash) f.push(t().f.tx(`<code>${short(s.action.hash)}</code>`));
+      if (s.action?.reason) f.push(t().f.reason(esc(tr(s.action.reason))));
+      if (s.late) f.push(t().f.late(esc(s.late)));
+      if (s.action?.kind === "failed" && !s.action.sent) f.push(t().f.nothing);
+      $("facts").innerHTML = f.map((x) => `<li>${x}</li>`).join("");
+      // ledger up to this step: events whose chain time is at or before this step's block
+      const until = s.block.timestamp, prevUntil = step ? fork.steps[step - 1].block.timestamp : -1;
+      const ev = fork.history.filter((e) => e.chainTime <= until);
+      $("log").innerHTML = ev.length ? ev.map((e) => `<div class="${e.chainTime > prevUntil ? "new" : ""}"><span class="t">#${e.period}</span> <span class="ty">${e.type}</span>${e.kind ? ` ${e.kind}` : ""}${e.hash ? ` ${short(e.hash)}` : ""}${e.reason ? ` <span class="r">${esc(tr(e.reason))}</span>` : ""}${e.source ? ` <span class="t">(${esc(src(e.source))})</span>` : ""}</div>`).join("") : `<span class="t">—</span>`;
+      $("log").scrollTop = $("log").scrollHeight;
+      const m = fork.money;
+      const cells = [t().proofs.money(usdcText(m.recipientReceived), m.transfersToRecipient, m.paidPeriods), t().proofs.rebuilt(fork.rebuilt.agreesWithLedger), t().proofs.windows()];
+      $("proofs").innerHTML = cells.map(([a, b]) => `<div class="proof"><b>${esc(a)}</b>${esc(b)}</div>`).join("");
+    }
+    const go = (i) => { step = Math.max(0, Math.min(fork.steps.length - 1, i)); renderReplay(); };
+    $("prev").onclick = () => { stop(); go(step - 1); };
+    $("next").onclick = () => { stop(); go(step + 1); };
+    $("step").oninput = (e) => { stop(); go(Number(e.target.value)); };
+    function stop() { clearInterval(timer); timer = null; $("play").textContent = t().play; }
+    $("play").onclick = () => {
+      if (timer) return stop();
+      if (step === fork.steps.length - 1) go(0);
+      $("play").textContent = t().pause;
+      timer = setInterval(() => { if (step >= fork.steps.length - 1) return stop(); go(step + 1); }, 3200);
+    };
+
+    // ───────── planner ─────────
+    function renderTabs() {
+      $("tabs").innerHTML = Object.entries(t().tabs).map(([k, v]) => `<button type="button" data-tab="${k}" class="${k === tab ? "on" : ""}">${esc(v)}</button>`).join("");
+      $("tabs").querySelectorAll("button").forEach((b) => (b.onclick = () => selectTab(b.dataset.tab)));
+    }
+    async function selectTab(k) {
+      tab = k; renderTabs(); $("msg").textContent = "";
+      $("form").hidden = k !== "mine"; $("liveBtn").hidden = k === "mine";
+      if (k === "mine") { view = mineView; return renderPlan(); }
+      if (!recorded[k]) { try { recorded[k] = { ...(await (await fetch(RUNS[k])).json()), source: "recorded" }; } catch { $("msg").textContent = t().errNet; return; } }
+      view = recorded[k]; renderPlan();
+    }
+    async function fetchPlan(url, init) {
+      [$("liveBtn"), $("planBtn")].forEach((b) => (b.disabled = true));
+      $("msg").className = "muted"; $("msg").textContent = t().running;
+      try {
+        const r = await fetch(url, init);
+        const j = await r.json().catch(() => ({ ok: false, error: t().errNet }));
+        if (!j.ok) throw new Error(j.error);
+        $("msg").textContent = "";
+        return { ...j, source: "live" };
+      } catch (e) {
+        $("msg").className = "err"; $("msg").textContent = e.message && e.message !== "Failed to fetch" ? e.message : t().errNet;
+        return null;
+      } finally { [$("liveBtn"), $("planBtn")].forEach((b) => (b.disabled = false)); }
+    }
+    $("liveBtn").onclick = async () => { const k = tab; const j = await fetchPlan(`/api/plan?example=${k}`); if (j && tab === k) { view = j; renderPlan(); } };
+    $("form").onsubmit = async (e) => {
+      e.preventDefault();
+      const body = { payer: $("f-payer").value.trim(), recipient: $("f-recipient").value.trim(), amount: $("f-amount").value.trim(), every: $("f-every").value, start: $("f-start").value.trim(), count: Number($("f-count").value), graceHours: Number($("f-grace").value), label: "Your schedule" };
+      const j = await fetchPlan("/api/plan", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+      if (tab !== "mine") return;
+      view = mineView = j; renderPlan();
+    };
+    function renderPlan() {
+      const v = view;
+      if (!v) { $("plan").innerHTML = ""; $("pmeta").textContent = ""; return; }
+      const s = v.schedule;
+      $("pmeta").innerHTML = `${esc(s.label ?? "")} · ${t().block} ${Number(v.block.number).toLocaleString(loc())} · ${esc(when(v.recordedAt ?? v.block.iso, { dateStyle: "medium", timeStyle: "short" }))} · <b>${v.source === "live" ? t().live : t().recorded}</b>`;
+      // counted from now, not from when the plan was read (a recorded plan may be days old)
+      const nextIn = v.next ? Date.parse(v.next.dueIso) / 1000 - Date.now() / 1000 : null;
+      const tiles = [
+        [t().tiles.covers, `${v.payer.covers > 999 ? "999+" : v.payer.covers}`, t().tiles.coversS(usdcText(v.payer.balanceText))],
+        [t().tiles.next, v.next ? `#${v.next.number}` : "—", v.next ? `${when(v.next.dueIso)}${nextIn > 0 ? ` · ${t().in(dur(nextIn))}` : ""}` : ""],
+        [t().tiles.gas, Number(v.gas.perPayment.gas).toLocaleString(loc()), t().tiles.gasS(v.gas.perPayment.pros.toLocaleString(loc(), { maximumFractionDigits: 6 }), v.gas.perPayment.usd.toLocaleString(loc(), { minimumFractionDigits: 5, maximumFractionDigits: 5 }))],
+        [t().tiles.total, `${usdcText(v.total.amount)} USDC`, t().tiles.totalS(v.total.payments)],
+      ];
+      const rows = v.periods.map((p) => `<tr><td class="num">${p.number}</td><td class="num">${esc(p.dueIso.replace("T", " ").replace(":00Z", ""))}</td><td class="num hide-s">${esc(p.windowEndsIso.replace("T", " ").replace(":00Z", ""))}</td><td class="num hide-s" title="${p.nonce}">${short(p.nonce)} · ${p.onChain === "unused" ? t().unused : t().consumed}</td><td>${p.status === "scheduled" || p.status === "due" ? (p.coveredToday ? `<span class="chip s-paid">${t().covered}</span>` : `<span class="chip s-failed">${t().notCovered}</span>`) : chip(p.status)}</td></tr>`).join("");
+      $("plan").innerHTML = `<div class="summary">${tiles.map(([k, a, b]) => `<div class="tile"><div class="k">${esc(k)}</div><div class="v">${esc(a)}</div><div class="s">${esc(b)}</div></div>`).join("")}</div>
+        <div style="overflow-x:auto"><table class="cal"><thead><tr>${t().cols.map((c, i) => `<th class="${i === 2 || i === 3 ? "hide-s" : ""}">${c}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>
+        ${v.warnings?.length ? `<ul class="warns">${v.warnings.map((w) => `<li>! ${esc(tr(w))}</li>`).join("")}</ul>` : ""}
+        <details><summary>${t().signed}</summary><div class="code">${esc(JSON.stringify({ domain: { name: "USDC", version: "2", chainId: 1672, verifyingContract: s.tokenAddress }, primaryType: "TransferWithAuthorization", message: { from: s.payer, to: s.recipient, value: s.amount, validAfter: String(v.periods[0].due - 1), validBefore: v.periods[0].windowEndsIso, nonce: v.periods[0].nonce }, "…": `${v.periods.length} messages, one per period` }, null, 2))}</div></details>`;
+    }
+
+    function renderRec() {
+      if (!rec) return;
+      const [a, b, c, d] = t().rec(rec);
+      $("rec").innerHTML = `<div class="summary" style="grid-template-columns:1fr 2fr 1.3fr"><div class="tile"><div class="k">${t().block}</div><div class="v">${esc(Number(rec.found.block).toLocaleString(loc()))}</div><div class="s">${esc(c)}</div></div><div class="tile"><div class="k">tx</div><div class="v" style="font-size:13px"><a href="${EXPLORER}/tx/${rec.found.hash}" target="_blank" rel="noopener">${rec.found.hash}</a></div><div class="s">authorizer <a href="${EXPLORER}/address/${rec.event.authorizer}" target="_blank" rel="noopener">${short(rec.event.authorizer)}</a> · nonce ${short(rec.event.nonce)}</div></div><div class="tile"><div class="k">✓</div><div class="v" style="font-size:14px;font-family:var(--sans)">${esc(d)}</div></div></div>`;
+    }
+
+    function renderStatic() {
+      document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
+      document.querySelectorAll("[data-i]").forEach((el) => (el.textContent = t()[el.dataset.i]));
+      if (!timer) $("play").textContent = t().play; else $("play").textContent = t().pause;
+      document.querySelectorAll(".lang button").forEach((b) => b.classList.toggle("on", b.dataset.lang === lang));
+      $("how").innerHTML = t().how.map(([a, b]) => `<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join("");
+      const r = recorded.rent?.recordedAt;
+      $("footer").innerHTML = `${r ? esc(t().footer(when(r, { dateStyle: "medium", timeStyle: "short" }))) : ""} · <a href="https://github.com/juhzinho/pharos-recurring-payments" target="_blank" rel="noopener">GitHub</a> · <a href="https://github.com/juhzinho/pharos-recurring-payments#readme" target="_blank" rel="noopener">README</a>`;
+    }
+    function renderAll() { renderStatic(); renderTabs(); renderReplay(); renderPlan(); renderRec(); }
+    document.querySelectorAll(".lang button").forEach((b) => (b.onclick = () => { lang = b.dataset.lang; try { localStorage.setItem("rp-lang", lang); } catch {} renderAll(); }));
+
+    $("f-payer").value = "0x6ea08ca8f313d860808ef7431fc72c6fbcf4a72d";
+    $("f-recipient").value = "0x3333333333333333333333333333333333333333";
+    $("f-amount").value = "99.90"; $("f-every").value = "monthly"; $("f-start").value = "2027-01-31T12:00:00Z"; $("f-count").value = "6"; $("f-grace").value = "72";
+    try { fork = await (await fetch("runs/fork-proof.json")).json(); } catch {}
+    try { rec = await (await fetch("runs/recovery.json")).json(); } catch {}
+    await selectTab("rent");
+    renderAll();
+  </script>
+</body>
+</html>

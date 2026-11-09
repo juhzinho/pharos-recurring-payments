@@ -1,0 +1,25 @@
+{
+  "recordedAt": "2026-11-09T14:48:41.653Z",
+  "network": "Pharos Pacific Mainnet",
+  "what": "A real EIP-3009 authorization used on Pacific, looked up again knowing only (authorizer, nonce): a binary search over authorizationState at past blocks, then that one block's log.",
+  "event": {
+    "block": 22413311,
+    "hash": "0xfb883c8bd2600a9ab9d7f5c600c62d6c31149063e09d2b1173c1dd8bff7c47c1",
+    "authorizer": "0x46441dc99f8000959e9c48Cf2A01a018D131D3Bb",
+    "nonce": "0x91f49cd148430aff99c79f70ed6c4b7e88c11f55c8dbd8f478147e30123eccd9",
+    "foundBy": "a log scan over the last 160,000 blocks"
+  },
+  "search": {
+    "from": 21913311,
+    "to": 22572370,
+    "blocks": 659059,
+    "seconds": 13.751
+  },
+  "found": {
+    "kind": "paid",
+    "block": 22413311,
+    "time": 1794088399,
+    "hash": "0xfb883c8bd2600a9ab9d7f5c600c62d6c31149063e09d2b1173c1dd8bff7c47c1"
+  },
+  "match": true
+}

@@ -1,0 +1,178 @@
+{
+  "recordedAt": "2026-11-09T14:46:58.160Z",
+  "network": "Pharos Pacific Mainnet",
+  "block": {
+    "number": 22572368,
+    "timestamp": 1794235700,
+    "iso": "2026-11-09T14:48:20Z"
+  },
+  "schedule": {
+    "payer": "0x6eA08ca8F313d860808ef7431fc72c6FbcF4A72D",
+    "recipient": "0x1111111111111111111111111111111111111111",
+    "token": "USDC",
+    "tokenAddress": "0xC879C018dB60520F4355C26eD1a6D572cdAC1815",
+    "decimals": 6,
+    "amount": "1850000000",
+    "every": "monthly",
+    "start": 1796029200,
+    "count": 12,
+    "graceHours": 72,
+    "salt": "1",
+    "label": "Studio rent",
+    "id": "0x05cf0d7c3947ddb1f430f88d787df62d4799709b214342c878a0ca7f1517120a"
+  },
+  "payer": {
+    "balance": "139890427209",
+    "balanceText": "139,890.427209",
+    "covers": 75,
+    "hasCode": false,
+    "eip7702": false
+  },
+  "periods": [
+    {
+      "number": 1,
+      "due": 1796029200,
+      "dueIso": "2026-11-30T09:00:00Z",
+      "windowEndsIso": "2026-12-03T09:00:00Z",
+      "nonce": "0x408df94e4e394b7602fde6d0c5c53e35184e49be7a09bb333490035cf49b541a",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 2,
+      "due": 1798621200,
+      "dueIso": "2026-12-30T09:00:00Z",
+      "windowEndsIso": "2027-01-02T09:00:00Z",
+      "nonce": "0xc6e04903e1f5d56152a769bdedfbeda876ad051d64b2669f404da423f18c6520",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 3,
+      "due": 1801299600,
+      "dueIso": "2027-01-30T09:00:00Z",
+      "windowEndsIso": "2027-02-02T09:00:00Z",
+      "nonce": "0x50aa58fea43e4ef79898787006f1aec341e14c609b4f37179ae6d94c12f502e8",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 4,
+      "due": 1803805200,
+      "dueIso": "2027-02-28T09:00:00Z",
+      "windowEndsIso": "2027-03-03T09:00:00Z",
+      "nonce": "0xcc358c35664423b227970216f9d7f7e56fc2dbfe46b84cc424cd9ea7ef2fed35",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 5,
+      "due": 1806397200,
+      "dueIso": "2027-03-30T09:00:00Z",
+      "windowEndsIso": "2027-04-02T09:00:00Z",
+      "nonce": "0x9137c17feae715c898c8968315c93f71004df7ebd1bdf2ddb1d5d0eac19f750c",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 6,
+      "due": 1809075600,
+      "dueIso": "2027-04-30T09:00:00Z",
+      "windowEndsIso": "2027-05-03T09:00:00Z",
+      "nonce": "0x75834a67e103ea14afe9317caabf96e3d35841b72bed7c59b3e1868ad2a1e5e3",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 7,
+      "due": 1811667600,
+      "dueIso": "2027-05-30T09:00:00Z",
+      "windowEndsIso": "2027-06-02T09:00:00Z",
+      "nonce": "0x3566b1c70200846c09a089f162bb763ad4bf8d368c20b9a665ccbbca42b544c3",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 8,
+      "due": 1814346000,
+      "dueIso": "2027-06-30T09:00:00Z",
+      "windowEndsIso": "2027-07-03T09:00:00Z",
+      "nonce": "0x0817fe775af0facf0b20acee2b5261bd9143d15eec9de6ecac52b2587e9c6c61",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 9,
+      "due": 1816938000,
+      "dueIso": "2027-07-30T09:00:00Z",
+      "windowEndsIso": "2027-08-02T09:00:00Z",
+      "nonce": "0xbd091a117495a22c974d378892b165ae0c45dc4a46fcab69c7e7a5d140ba9e70",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 10,
+      "due": 1819616400,
+      "dueIso": "2027-08-30T09:00:00Z",
+      "windowEndsIso": "2027-09-02T09:00:00Z",
+      "nonce": "0xe1fb1efcd27754413484a83b22756f533b6c41db53e994d237c88ffe6c4c496b",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 11,
+      "due": 1822294800,
+      "dueIso": "2027-09-30T09:00:00Z",
+      "windowEndsIso": "2027-10-03T09:00:00Z",
+      "nonce": "0x4d0b2117ab5d1a7e19cec56e2e3f522d3f57678e8ea0b20eeeb81d80a20c2358",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 12,
+      "due": 1824886800,
+      "dueIso": "2027-10-30T09:00:00Z",
+      "windowEndsIso": "2027-11-02T09:00:00Z",
+      "nonce": "0xf85672b14a0fa49563d74c0e30cb04fe33ec917a67138aa1dca43f45e8b02f2a",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    }
+  ],
+  "next": {
+    "number": 1,
+    "dueIso": "2026-11-30T09:00:00Z",
+    "inSeconds": 1793500
+  },
+  "total": {
+    "payments": 12,
+    "amount": "22,200"
+  },
+  "gas": {
+    "perPayment": {
+      "gas": "112438",
+      "pros": 0.00112438,
+      "usd": 0.0005752574080243986
+    },
+    "baseFeeGwei": 10,
+    "prosUsd": 0.5116218787459743,
+    "paidBy": "whoever submits each payment (a relayer, the recipient, the payer) — the authorization does not depend on the sender",
+    "measuredWith": "an equivalent test signer: same amount, same recipient, USDC applied by state override"
+  },
+  "sign": {
+    "messages": 12,
+    "what": "one EIP-712 USDC TransferWithAuthorization per period (eth_signTypedData_v4) — no gas, signed once"
+  },
+  "warnings": []
+}

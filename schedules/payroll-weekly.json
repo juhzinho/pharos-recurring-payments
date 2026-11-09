@@ -1,0 +1,11 @@
+{
+  "label": "Weekly contractor payout",
+  "payer": "0x6ea08ca8f313d860808ef7431fc72c6fbcf4a72d",
+  "recipient": "0x2222222222222222222222222222222222222222",
+  "token": "USDC",
+  "amount": "640.5",
+  "every": "weekly",
+  "start": "2026-11-13T17:00:00Z",
+  "count": 8,
+  "graceHours": 48
+}

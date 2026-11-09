@@ -1,0 +1,11 @@
+{
+  "label": "Studio rent",
+  "payer": "0x6ea08ca8f313d860808ef7431fc72c6fbcf4a72d",
+  "recipient": "0x1111111111111111111111111111111111111111",
+  "token": "USDC",
+  "amount": "1850",
+  "every": "monthly",
+  "start": "2026-11-30T09:00:00Z",
+  "count": 12,
+  "graceHours": 72
+}

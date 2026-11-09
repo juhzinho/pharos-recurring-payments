@@ -1,0 +1,138 @@
+{
+  "recordedAt": "2026-11-09T14:46:59.896Z",
+  "network": "Pharos Pacific Mainnet",
+  "block": {
+    "number": 22572369,
+    "timestamp": 1794235700,
+    "iso": "2026-11-09T14:48:20Z"
+  },
+  "schedule": {
+    "payer": "0x6eA08ca8F313d860808ef7431fc72c6FbcF4A72D",
+    "recipient": "0x2222222222222222222222222222222222222222",
+    "token": "USDC",
+    "tokenAddress": "0xC879C018dB60520F4355C26eD1a6D572cdAC1815",
+    "decimals": 6,
+    "amount": "640500000",
+    "every": "weekly",
+    "start": 1794589200,
+    "count": 8,
+    "graceHours": 48,
+    "salt": "1",
+    "label": "Weekly contractor payout",
+    "id": "0x1ebddc6a3407ec57514b09180d6d1166714923d1db0305262ef9811121a2deca"
+  },
+  "payer": {
+    "balance": "139890427209",
+    "balanceText": "139,890.427209",
+    "covers": 218,
+    "hasCode": false,
+    "eip7702": false
+  },
+  "periods": [
+    {
+      "number": 1,
+      "due": 1794589200,
+      "dueIso": "2026-11-13T17:00:00Z",
+      "windowEndsIso": "2026-11-15T17:00:00Z",
+      "nonce": "0xfcf155eb7c55ec52c25538e286050fbc15b19a4512aba270af06a0e33b304e2d",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 2,
+      "due": 1795194000,
+      "dueIso": "2026-11-20T17:00:00Z",
+      "windowEndsIso": "2026-11-22T17:00:00Z",
+      "nonce": "0x81629efae8c5f114d2e2961632933dbc9d60700e67d95a9865797fc5db442390",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 3,
+      "due": 1795798800,
+      "dueIso": "2026-11-27T17:00:00Z",
+      "windowEndsIso": "2026-11-29T17:00:00Z",
+      "nonce": "0x7f3bfbf95bd5f95f33509f433fd9d7153a2110e9bf50e425badb69853a53c961",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 4,
+      "due": 1796403600,
+      "dueIso": "2026-12-04T17:00:00Z",
+      "windowEndsIso": "2026-12-06T17:00:00Z",
+      "nonce": "0xda308ad4418f4ba7a6bc5d0af5f10ecc6fc44c1324a1fd4db415414515949a10",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 5,
+      "due": 1797008400,
+      "dueIso": "2026-12-11T17:00:00Z",
+      "windowEndsIso": "2026-12-13T17:00:00Z",
+      "nonce": "0x5ad1514c2a2bad73f53666b992e44b689c8c62c1593c69188db4872af52dcad9",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 6,
+      "due": 1797613200,
+      "dueIso": "2026-12-18T17:00:00Z",
+      "windowEndsIso": "2026-12-20T17:00:00Z",
+      "nonce": "0x070af01c3f23165536e34090903a756fd581c69f1d25f32ea3c33840aabb6885",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 7,
+      "due": 1798218000,
+      "dueIso": "2026-12-25T17:00:00Z",
+      "windowEndsIso": "2026-12-27T17:00:00Z",
+      "nonce": "0xcdb027642410337190b9e8dc8feb3367409fe58b72a8f5379f6822d02fd04a35",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    },
+    {
+      "number": 8,
+      "due": 1798822800,
+      "dueIso": "2027-01-01T17:00:00Z",
+      "windowEndsIso": "2027-01-03T17:00:00Z",
+      "nonce": "0xe49c0ff21969403e463f781de837c2fd73a99b9df89d0cb73a56c2f82f59a3a6",
+      "onChain": "unused",
+      "status": "scheduled",
+      "coveredToday": true
+    }
+  ],
+  "next": {
+    "number": 1,
+    "dueIso": "2026-11-13T17:00:00Z",
+    "inSeconds": 353500
+  },
+  "total": {
+    "payments": 8,
+    "amount": "5,124"
+  },
+  "gas": {
+    "perPayment": {
+      "gas": "112422",
+      "pros": 0.00112422,
+      "usd": 0.0005751755485237992
+    },
+    "baseFeeGwei": 10,
+    "prosUsd": 0.5116218787459743,
+    "paidBy": "whoever submits each payment (a relayer, the recipient, the payer) — the authorization does not depend on the sender",
+    "measuredWith": "an equivalent test signer: same amount, same recipient, USDC applied by state override"
+  },
+  "sign": {
+    "messages": 8,
+    "what": "one EIP-712 USDC TransferWithAuthorization per period (eth_signTypedData_v4) — no gas, signed once"
+  },
+  "warnings": []
+}

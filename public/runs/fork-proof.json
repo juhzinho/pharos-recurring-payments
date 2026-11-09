@@ -1,0 +1,968 @@
+{
+  "recordedAt": "2026-11-09T14:44:36.686Z",
+  "network": "Anvil fork of Pharos Pacific",
+  "note": "test wallets: fresh keys funded on the fork only; the chain clock is moved forward with evm_setNextBlockTimestamp",
+  "steps": [
+    {
+      "label": "P1 · one hour before the due time: nothing to do; the chain itself refuses an early payment",
+      "block": {
+        "number": 22572218,
+        "timestamp": 1794319200,
+        "iso": "2026-11-10T14:00:00Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": null,
+      "early": "FiatTokenV2: authorization is not yet valid"
+    },
+    {
+      "label": "P1 · due: the agent pays",
+      "block": {
+        "number": 22572219,
+        "timestamp": 1794322830,
+        "iso": "2026-11-10T15:00:30Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": {
+        "period": 1,
+        "kind": "confirmed",
+        "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+        "paid": 1,
+        "gasUsed": "102888"
+      }
+    },
+    {
+      "label": "P2 · after the crash: the next tick finds the payment on chain — and sends nothing",
+      "block": {
+        "number": 22572223,
+        "timestamp": 1794927900,
+        "iso": "2026-11-17T15:05:00Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": null,
+      "lostHash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+      "replay": {
+        "hash": "0xee3e99cdaaf9a474ed9a47902451eaa118e81eeb0e0e33a6d4f889e665c01ee2",
+        "status": "reverted",
+        "reason": "FiatTokenV2: authorization is used or canceled"
+      }
+    },
+    {
+      "label": "P3 · due with 100 USDC: failed, nothing sent",
+      "block": {
+        "number": 22572226,
+        "timestamp": 1795532430,
+        "iso": "2026-11-24T15:00:30Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "failed",
+          "hash": null,
+          "reason": "insufficient balance: the payer has 100 USDC, the payment is 250 USDC"
+        },
+        {
+          "number": 4,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": {
+        "period": 3,
+        "kind": "failed",
+        "reason": "insufficient balance: the payer has 100 USDC, the payment is 250 USDC",
+        "retryUntil": "2026-11-26T15:00:00Z",
+        "sent": false
+      }
+    },
+    {
+      "label": "P3 · six hours later, still short: failed again, still nothing sent",
+      "block": {
+        "number": 22572227,
+        "timestamp": 1795554000,
+        "iso": "2026-11-24T21:00:00Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "failed",
+          "hash": null,
+          "reason": "insufficient balance: the payer has 100 USDC, the payment is 250 USDC"
+        },
+        {
+          "number": 4,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": {
+        "period": 3,
+        "kind": "failed",
+        "reason": "insufficient balance: the payer has 100 USDC, the payment is 250 USDC",
+        "retryUntil": "2026-11-26T15:00:00Z",
+        "sent": false
+      }
+    },
+    {
+      "label": "P3 · after the top-up: paid — once",
+      "block": {
+        "number": 22572228,
+        "timestamp": 1795557600,
+        "iso": "2026-11-24T22:00:00Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "paid",
+          "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": {
+        "period": 3,
+        "kind": "confirmed",
+        "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+        "paid": 3,
+        "gasUsed": "85792"
+      }
+    },
+    {
+      "label": "P4 · the payer moved USDC out in the same block: the sent payment reverted",
+      "block": {
+        "number": 22572230,
+        "timestamp": 1796137230,
+        "iso": "2026-12-01T15:00:30Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "paid",
+          "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "failed",
+          "hash": null,
+          "reason": "transaction reverted: ERC20: transfer amount exceeds balance"
+        },
+        {
+          "number": 5,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": {
+        "period": 4,
+        "kind": "failed",
+        "hash": "0xb4f8cffa48bda8b7fe07e1a3ea0239a801faabde2ebc5cfd6ff95ea219a4bd3d",
+        "reason": "transaction reverted: ERC20: transfer amount exceeds balance",
+        "sent": true
+      },
+      "drain": "0x7db26f49da7f56648175c810defb0d9734a451c6491e8a9d907c0c915e198ea2"
+    },
+    {
+      "label": "P4 · after the top-up: paid — once",
+      "block": {
+        "number": 22572232,
+        "timestamp": 1796140800,
+        "iso": "2026-12-01T16:00:00Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "paid",
+          "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "paid",
+          "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": {
+        "period": 4,
+        "kind": "confirmed",
+        "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+        "paid": 4,
+        "gasUsed": "85812"
+      }
+    },
+    {
+      "label": "P5 · cancelled by the payer before its due time: the agent finds it and pays nothing",
+      "block": {
+        "number": 22572235,
+        "timestamp": 1796742030,
+        "iso": "2026-12-08T15:00:30Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "paid",
+          "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "paid",
+          "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "cancelled",
+          "hash": "0x3e2994d674c164aeb7097527d628a7447b5a42224b9a86a2afb903f4790df800",
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "scheduled",
+          "hash": null,
+          "reason": null
+        }
+      ],
+      "action": null,
+      "cancelHash": "0x3e2994d674c164aeb7097527d628a7447b5a42224b9a86a2afb903f4790df800"
+    },
+    {
+      "label": "P6 · due with 0 USDC: failed, nothing sent",
+      "block": {
+        "number": 22572236,
+        "timestamp": 1797346830,
+        "iso": "2026-12-15T15:00:30Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "paid",
+          "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "paid",
+          "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "cancelled",
+          "hash": "0x3e2994d674c164aeb7097527d628a7447b5a42224b9a86a2afb903f4790df800",
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "failed",
+          "hash": null,
+          "reason": "insufficient balance: the payer has 0 USDC, the payment is 250 USDC"
+        }
+      ],
+      "action": {
+        "period": 6,
+        "kind": "failed",
+        "reason": "insufficient balance: the payer has 0 USDC, the payment is 250 USDC",
+        "retryUntil": "2026-12-17T15:00:00Z",
+        "sent": false
+      }
+    },
+    {
+      "label": "P6 · the window closed: missed — and even with money now, the expired authorization cannot be used",
+      "block": {
+        "number": 22572237,
+        "timestamp": 1797519660,
+        "iso": "2026-12-17T15:01:00Z"
+      },
+      "periods": [
+        {
+          "number": 1,
+          "status": "paid",
+          "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+          "reason": null
+        },
+        {
+          "number": 2,
+          "status": "paid",
+          "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+          "reason": null
+        },
+        {
+          "number": 3,
+          "status": "paid",
+          "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+          "reason": null
+        },
+        {
+          "number": 4,
+          "status": "paid",
+          "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+          "reason": null
+        },
+        {
+          "number": 5,
+          "status": "cancelled",
+          "hash": "0x3e2994d674c164aeb7097527d628a7447b5a42224b9a86a2afb903f4790df800",
+          "reason": null
+        },
+        {
+          "number": 6,
+          "status": "missed",
+          "hash": null,
+          "reason": "insufficient balance: the payer has 0 USDC, the payment is 250 USDC"
+        }
+      ],
+      "action": null,
+      "late": "FiatTokenV2: authorization is expired"
+    }
+  ],
+  "forkBlock": 22572217,
+  "schedule": {
+    "payer": "0x0f09328f845C29746d54994c8aDc7147e6BF39Bb",
+    "recipient": "0x13C03328Bd57a18aa8189bFb04db77210B7cFbd1",
+    "token": "USDC",
+    "amount": "250",
+    "every": "weekly",
+    "start": "2026-11-10T15:00:00Z",
+    "count": 6,
+    "graceHours": 48,
+    "label": "Studio rent (weekly, fork demo)",
+    "id": "0xbc63fc9d93e543c5b1d068c8bcba8b031e8a7cb5a2d81e35294c51cebf8793e1",
+    "periods": [
+      {
+        "number": 1,
+        "due": "2026-11-10T15:00:00Z",
+        "windowEnds": "2026-11-12T15:00:00Z",
+        "nonce": "0xfcd96255898e3df03b2f895d04ee4de539892b58150333211a76d479ad5224c9"
+      },
+      {
+        "number": 2,
+        "due": "2026-11-17T15:00:00Z",
+        "windowEnds": "2026-11-19T15:00:00Z",
+        "nonce": "0x9a5fbddafbffc6463a1f7e04dbbd470cea7febe8c9fdb856d6c483589a55e9fc"
+      },
+      {
+        "number": 3,
+        "due": "2026-11-24T15:00:00Z",
+        "windowEnds": "2026-11-26T15:00:00Z",
+        "nonce": "0x4048d27455c8b2b776cb547a75bdf6183d3496ca6803f722aacbfd5e61ec0e28"
+      },
+      {
+        "number": 4,
+        "due": "2026-12-01T15:00:00Z",
+        "windowEnds": "2026-12-03T15:00:00Z",
+        "nonce": "0x033b15e888e4620468a46b7456f1983368eb61832707c39d87310876f6682b71"
+      },
+      {
+        "number": 5,
+        "due": "2026-12-08T15:00:00Z",
+        "windowEnds": "2026-12-10T15:00:00Z",
+        "nonce": "0x3c165252dd9ecf2986d2756f25e9a6742e2dd975b59f87141c55f6c504d353cc"
+      },
+      {
+        "number": 6,
+        "due": "2026-12-15T15:00:00Z",
+        "windowEnds": "2026-12-17T15:00:00Z",
+        "nonce": "0x93733679ffb15adce310cf4c4bc1469ecd1e104b5b501bdd3aa7c4bc148fedcb"
+      }
+    ]
+  },
+  "final": [
+    {
+      "number": 1,
+      "due": 1794322800,
+      "dueIso": "2026-11-10T15:00:00Z",
+      "windowEnds": 1794495600,
+      "windowEndsIso": "2026-11-12T15:00:00Z",
+      "nonce": "0xfcd96255898e3df03b2f895d04ee4de539892b58150333211a76d479ad5224c9",
+      "status": "paid",
+      "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+      "block": 22572220,
+      "paidAt": 1794322831,
+      "failures": []
+    },
+    {
+      "number": 2,
+      "due": 1794927600,
+      "dueIso": "2026-11-17T15:00:00Z",
+      "windowEnds": 1795100400,
+      "windowEndsIso": "2026-11-19T15:00:00Z",
+      "nonce": "0x9a5fbddafbffc6463a1f7e04dbbd470cea7febe8c9fdb856d6c483589a55e9fc",
+      "status": "paid",
+      "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+      "block": 22572222,
+      "paidAt": 1794927630,
+      "failures": []
+    },
+    {
+      "number": 3,
+      "due": 1795532400,
+      "dueIso": "2026-11-24T15:00:00Z",
+      "windowEnds": 1795705200,
+      "windowEndsIso": "2026-11-26T15:00:00Z",
+      "nonce": "0x4048d27455c8b2b776cb547a75bdf6183d3496ca6803f722aacbfd5e61ec0e28",
+      "status": "paid",
+      "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+      "block": 22572229,
+      "paidAt": 1795557600,
+      "failures": [
+        {
+          "at": 1795532430,
+          "reason": "insufficient balance: the payer has 100 USDC, the payment is 250 USDC",
+          "hash": null
+        },
+        {
+          "at": 1795554000,
+          "reason": "insufficient balance: the payer has 100 USDC, the payment is 250 USDC",
+          "hash": null
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "due": 1796137200,
+      "dueIso": "2026-12-01T15:00:00Z",
+      "windowEnds": 1796310000,
+      "windowEndsIso": "2026-12-03T15:00:00Z",
+      "nonce": "0x033b15e888e4620468a46b7456f1983368eb61832707c39d87310876f6682b71",
+      "status": "paid",
+      "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+      "block": 22572233,
+      "paidAt": 1796140800,
+      "failures": [
+        {
+          "at": 1796137230,
+          "reason": "transaction reverted: ERC20: transfer amount exceeds balance",
+          "hash": "0xb4f8cffa48bda8b7fe07e1a3ea0239a801faabde2ebc5cfd6ff95ea219a4bd3d"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "due": 1796742000,
+      "dueIso": "2026-12-08T15:00:00Z",
+      "windowEnds": 1796914800,
+      "windowEndsIso": "2026-12-10T15:00:00Z",
+      "nonce": "0x3c165252dd9ecf2986d2756f25e9a6742e2dd975b59f87141c55f6c504d353cc",
+      "status": "cancelled",
+      "hash": "0x3e2994d674c164aeb7097527d628a7447b5a42224b9a86a2afb903f4790df800",
+      "block": 22572234,
+      "paidAt": 1796140800,
+      "failures": []
+    },
+    {
+      "number": 6,
+      "due": 1797346800,
+      "dueIso": "2026-12-15T15:00:00Z",
+      "windowEnds": 1797519600,
+      "windowEndsIso": "2026-12-17T15:00:00Z",
+      "nonce": "0x93733679ffb15adce310cf4c4bc1469ecd1e104b5b501bdd3aa7c4bc148fedcb",
+      "status": "missed",
+      "failures": [
+        {
+          "at": 1797346830,
+          "reason": "insufficient balance: the payer has 0 USDC, the payment is 250 USDC",
+          "hash": null
+        }
+      ],
+      "reason": "insufficient balance: the payer has 0 USDC, the payment is 250 USDC"
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-11-09T14:44:42.516Z",
+      "period": 1,
+      "type": "attempt",
+      "block": 22572219,
+      "chainTime": 1794322830
+    },
+    {
+      "at": "2026-11-09T14:44:42.531Z",
+      "period": 1,
+      "type": "submitted",
+      "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+      "chainTime": 1794322830
+    },
+    {
+      "at": "2026-11-09T14:44:42.554Z",
+      "period": 1,
+      "type": "confirmed",
+      "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+      "block": 22572220,
+      "gasUsed": "102888",
+      "chainTime": 1794322830
+    },
+    {
+      "at": "2026-11-09T14:44:42.725Z",
+      "period": 1,
+      "type": "settled",
+      "kind": "paid",
+      "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08",
+      "block": 22572220,
+      "time": 1794322831,
+      "chainTime": 1794322830,
+      "source": "this agent's transaction"
+    },
+    {
+      "at": "2026-11-09T14:44:42.762Z",
+      "period": 2,
+      "type": "attempt",
+      "chainTime": 1794927630
+    },
+    {
+      "at": "2026-11-09T14:44:43.135Z",
+      "period": 2,
+      "type": "settled",
+      "kind": "paid",
+      "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde",
+      "block": 22572222,
+      "time": 1794927630,
+      "chainTime": 1794927900,
+      "source": "this agent's interrupted send: the intent was on disk, the hash was not — recovered from the chain, nothing re-sent"
+    },
+    {
+      "at": "2026-11-09T14:44:44.102Z",
+      "period": 3,
+      "type": "failed",
+      "reason": "insufficient balance: the payer has 100 USDC, the payment is 250 USDC",
+      "block": 22572226,
+      "chainTime": 1795532430,
+      "retryUntil": 1795705200,
+      "sent": false
+    },
+    {
+      "at": "2026-11-09T14:44:44.251Z",
+      "period": 3,
+      "type": "failed",
+      "reason": "insufficient balance: the payer has 100 USDC, the payment is 250 USDC",
+      "block": 22572227,
+      "chainTime": 1795554000,
+      "retryUntil": 1795705200,
+      "sent": false
+    },
+    {
+      "at": "2026-11-09T14:44:44.431Z",
+      "period": 3,
+      "type": "attempt",
+      "block": 22572228,
+      "chainTime": 1795557600
+    },
+    {
+      "at": "2026-11-09T14:44:44.439Z",
+      "period": 3,
+      "type": "submitted",
+      "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+      "chainTime": 1795557600
+    },
+    {
+      "at": "2026-11-09T14:44:44.466Z",
+      "period": 3,
+      "type": "confirmed",
+      "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+      "block": 22572229,
+      "gasUsed": "85792",
+      "chainTime": 1795557600
+    },
+    {
+      "at": "2026-11-09T14:44:44.496Z",
+      "period": 3,
+      "type": "settled",
+      "kind": "paid",
+      "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8",
+      "block": 22572229,
+      "time": 1795557600,
+      "chainTime": 1795557600,
+      "source": "this agent's transaction"
+    },
+    {
+      "at": "2026-11-09T14:44:44.641Z",
+      "period": 4,
+      "type": "attempt",
+      "block": 22572230,
+      "chainTime": 1796137230
+    },
+    {
+      "at": "2026-11-09T14:44:44.650Z",
+      "period": 4,
+      "type": "submitted",
+      "hash": "0xb4f8cffa48bda8b7fe07e1a3ea0239a801faabde2ebc5cfd6ff95ea219a4bd3d",
+      "chainTime": 1796137230
+    },
+    {
+      "at": "2026-11-09T14:44:45.142Z",
+      "period": 4,
+      "type": "failed",
+      "hash": "0xb4f8cffa48bda8b7fe07e1a3ea0239a801faabde2ebc5cfd6ff95ea219a4bd3d",
+      "block": 22572231,
+      "reason": "transaction reverted: ERC20: transfer amount exceeds balance",
+      "chainTime": 1796137230,
+      "retryUntil": 1796310000,
+      "sent": true
+    },
+    {
+      "at": "2026-11-09T14:44:45.252Z",
+      "period": 4,
+      "type": "attempt",
+      "block": 22572232,
+      "chainTime": 1796140800
+    },
+    {
+      "at": "2026-11-09T14:44:45.260Z",
+      "period": 4,
+      "type": "submitted",
+      "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+      "chainTime": 1796140800
+    },
+    {
+      "at": "2026-11-09T14:44:45.281Z",
+      "period": 4,
+      "type": "confirmed",
+      "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+      "block": 22572233,
+      "gasUsed": "85812",
+      "chainTime": 1796140800
+    },
+    {
+      "at": "2026-11-09T14:44:45.295Z",
+      "period": 4,
+      "type": "settled",
+      "kind": "paid",
+      "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313",
+      "block": 22572233,
+      "time": 1796140800,
+      "chainTime": 1796140800,
+      "source": "this agent's transaction"
+    },
+    {
+      "at": "2026-11-09T14:44:45.542Z",
+      "period": 5,
+      "type": "settled",
+      "kind": "cancelled",
+      "hash": "0x3e2994d674c164aeb7097527d628a7447b5a42224b9a86a2afb903f4790df800",
+      "block": 22572234,
+      "time": 1796140800,
+      "chainTime": 1796742030,
+      "source": "cancelled by the payer on chain"
+    },
+    {
+      "at": "2026-11-09T14:44:45.618Z",
+      "period": 6,
+      "type": "failed",
+      "reason": "insufficient balance: the payer has 0 USDC, the payment is 250 USDC",
+      "block": 22572236,
+      "chainTime": 1797346830,
+      "retryUntil": 1797519600,
+      "sent": false
+    },
+    {
+      "at": "2026-11-09T14:44:45.698Z",
+      "period": 6,
+      "type": "missed",
+      "chainTime": 1797519660,
+      "reason": "the window closed unpaid: the authorization expired and can never be used"
+    }
+  ],
+  "rebuilt": {
+    "periods": [
+      {
+        "number": 1,
+        "status": "paid",
+        "hash": "0x658d4f5272bc823d4df4e87698977f6414f3b00cb2bf5dbeed57c24089f40d08"
+      },
+      {
+        "number": 2,
+        "status": "paid",
+        "hash": "0xd01a4c85cf570f543e88b1d07ab9dce59cb742e709cbf26139548f4155dc0cde"
+      },
+      {
+        "number": 3,
+        "status": "paid",
+        "hash": "0x486f2a243f5bf7062f443220a82b80431480f846f6362923997d098f276b67a8"
+      },
+      {
+        "number": 4,
+        "status": "paid",
+        "hash": "0x24c19027ee4ea0607f403d8bf393fe19b8b29e4c165aeca5e39881c33f202313"
+      },
+      {
+        "number": 5,
+        "status": "cancelled",
+        "hash": "0x3e2994d674c164aeb7097527d628a7447b5a42224b9a86a2afb903f4790df800"
+      },
+      {
+        "number": 6,
+        "status": "missed",
+        "hash": null
+      }
+    ],
+    "agreesWithLedger": true
+  },
+  "money": {
+    "recipientReceived": "1,000",
+    "transfersToRecipient": 4,
+    "paidPeriods": 4,
+    "perTransfer": [
+      "250",
+      "250",
+      "250",
+      "250"
+    ]
+  }
+}
